@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/sesions")
+@RequestMapping("/objects")
 public class ObjectRestController
 {
 	@Autowired
@@ -23,6 +23,7 @@ public class ObjectRestController
 	@PostMapping(value = "/", consumes = "application/json")
 	public void store(@RequestBody StoreObjectDTO objectToStore) {
 		System.out.println();
+		
 	}
 	
 	// load
