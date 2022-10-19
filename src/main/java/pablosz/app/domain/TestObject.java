@@ -1,8 +1,8 @@
 package pablosz.app.domain;
 
 import lombok.Data;
-import pablosz.ann.NotPersistable;
-import pablosz.ann.Persistable;
+import pablosz.app.persistance.ann.NotPersistable;
+import pablosz.app.persistance.ann.Persistable;
 
 @Data
 public class TestObject {

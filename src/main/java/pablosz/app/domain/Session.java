@@ -1,6 +1,7 @@
 package pablosz.app.domain;
 
 import lombok.Data;
+import pablosz.app.persistance.PersistentObject;
 
 import javax.persistence.*;
 import java.util.List;

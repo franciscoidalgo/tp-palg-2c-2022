@@ -1,9 +1,12 @@
-package pablosz.app.domain;
+package pablosz.app.persistance;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.Data;
-import pablosz.ann.Persistable;
+import pablosz.app.persistance.ann.NotPersistable;
+import pablosz.app.persistance.ann.Persistable;
+import pablosz.app.domain.Session;
+
 import javax.persistence.*;
 import java.lang.reflect.Field;
 
@@ -34,12 +37,14 @@ public class PersistentObject {
 		this.data = data;
 	}
 
-	public PersistentObject(Object o) throws IllegalAccessException {
+	public PersistentObject(Object o) throws IllegalAccessException, InvalidPersistException {
 		Gson gson = new Gson();
 		JsonObject jsonElement = new JsonObject();
-		Field[] fields = o.getClass().getDeclaredFields();
+		Class clazz = o.getClass();
+		if (clazz.isAnnotationPresent(NotPersistable.class)) throw new InvalidPersistException();
+		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields){
-			if (field.isAnnotationPresent(Persistable.class)){
+			if (field.isAnnotationPresent(Persistable.class) || (clazz.isAnnotationPresent(Persistable.class) && !field.isAnnotationPresent(NotPersistable.class))){
 				jsonElement.addProperty(field.getName(), gson.toJson(field.get(o)));
 			}
 		}

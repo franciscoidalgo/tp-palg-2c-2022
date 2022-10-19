@@ -1,8 +1,8 @@
 package pablosz.app.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import pablosz.app.persistance.PersistentObject;
 
 @Getter @Setter
 public class StoreObjectDTO {
