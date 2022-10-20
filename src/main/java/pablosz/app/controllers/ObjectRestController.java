@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pablosz.app.domain.StoreObjectDTO;
 
 @RestController
 @RequestMapping("/objects")
@@ -20,11 +19,13 @@ public class ObjectRestController
 	@Autowired
 	private EntityManager em;
 	
+	// No se usa mas no? BORRAR
+	/*
+	
 	// store
 	@PostMapping(value = "/", consumes = "application/json")
 	public void store(@RequestBody StoreObjectDTO objectToStore) {
 		System.out.println();
-		
 	}
 	
 	// load
@@ -40,5 +41,6 @@ public class ObjectRestController
 		
 	}
 
+	*/
 	
 }

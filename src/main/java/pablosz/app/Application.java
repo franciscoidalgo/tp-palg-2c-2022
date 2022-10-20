@@ -1,6 +1,7 @@
 package pablosz.app;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+
+import pablosz.app.domain.Session;
+import pablosz.app.persistance.PersistentObject;
+import pablosz.app.persistance.Persistidor;
 
 
 // +---------------------------------------------------------+
@@ -16,9 +23,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 // | explicitamente cada uno de estos descomenando las       |
 // | siguientes lineas: @ComponentScan y @EntityScan         |
 // +---------------------------------------------------------+
-// @ComponentScan(basePackages={"pablosz.pkgcomponentes1,pablosz.pkgcomponentes2,etc..."})
-// @EntityScan(basePackages={"pablosz.pkgdomain1,pkgpablosz.domain2,etc"})
-
+@ComponentScan
+@EntityScan
 @SpringBootApplication
 public class Application implements CommandLineRunner
 {
@@ -32,9 +38,14 @@ public class Application implements CommandLineRunner
 	@Autowired
 	private EntityManager em;
 	
+	@Autowired
+	private Persistidor p;
+	
 	@Override
+	@Transactional
 	public void run(String... args) throws Exception
 	{
 		LOG.info("Todo funciona correctamente? "+(em!=null));
+		//p.createSession(2, 1);
 	}
 }

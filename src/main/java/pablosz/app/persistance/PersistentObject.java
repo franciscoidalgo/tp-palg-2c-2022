@@ -8,10 +8,15 @@ import pablosz.app.persistance.ann.Persistable;
 import pablosz.app.domain.Session;
 
 import javax.persistence.*;
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.lang.reflect.Field;
 
 @Entity
-@Table(name = "persitent_objects")
+@Table(name = "PERSISTENT_OBJECT")
 @Data
 public class PersistentObject {
 
@@ -19,42 +24,56 @@ public class PersistentObject {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@Transient
-	private Session session;
+	@Column(name = "SESSION_KEY")
+	private long sessionKey;
 
-	@Column
+	@Column(name = "CLASS_NAME")
 	private String className;
 
-	@Column
+	@Column(name = "DATA")
 	private String data; // Json
 
-	public PersistentObject() {
+	public int getId() {
+		return id;
 	}
 
-	public PersistentObject(int key, int timeout, String className, String data) {
-		this.session = new Session(key, timeout);
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public long getSessionKey() {
+		return sessionKey;
+	}
+
+	public void setSessionKey(long sessionKey) {
+		this.sessionKey = sessionKey;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
 		this.className = className;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
 		this.data = data;
 	}
 
-	public PersistentObject(Object o) throws IllegalAccessException, InvalidPersistException {
-		Gson gson = new Gson();
-		JsonObject jsonElement = new JsonObject();
-		Class clazz = o.getClass();
-		if (clazz.isAnnotationPresent(NotPersistable.class)) throw new InvalidPersistException();
-		Field[] fields = clazz.getDeclaredFields();
-		for (Field field : fields){
-			if (field.isAnnotationPresent(Persistable.class) || (clazz.isAnnotationPresent(Persistable.class) && !field.isAnnotationPresent(NotPersistable.class))){
-				jsonElement.addProperty(field.getName(), gson.toJson(field.get(o)));
-			}
-		}
-		this.className = o.getClass().getName();
-		this.data = gson.toJson(jsonElement);
+	public PersistentObject(int id, long sessionKey, String className, String data) {
+		super();
+		this.id = id;
+		this.sessionKey = sessionKey;
+		this.className = className;
+		this.data = data;
 	}
-
-	public <T> T toObject(Class<T> c) throws ClassNotFoundException {
-		Gson gson = new Gson();
-		return gson.fromJson(this.data, c);
+	
+	public PersistentObject() {
+		
 	}
-
 }

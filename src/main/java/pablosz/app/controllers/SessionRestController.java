@@ -19,6 +19,8 @@ public class SessionRestController
 	@Autowired
 	private EntityManager em;
 	
+	// No se usa mas no? BORRAR
+	/*
 	// createSession
 	@PostMapping("/")
 	@Transactional
@@ -35,4 +37,5 @@ public class SessionRestController
 			em.remove(sessionToDestroy);
 		}
 	}
+	*/
 }
