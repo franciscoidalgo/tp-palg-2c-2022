@@ -1,6 +1,7 @@
 package pablosz.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -33,7 +34,7 @@ public class PersistentObjectTest
 	@Autowired
 	private Persistidor persistidor;
 	
-	private Persona persona = new Persona("nombre", "apellido", 22, 180);
+	private Persona persona = new Persona("nombrePersona", "apellidoPersona", 22, 180);
 	private Auto auto = new Auto("Ford", "Fiesta");
 	
 	/*@BeforeEach
@@ -53,19 +54,31 @@ public class PersistentObjectTest
 	@Test
 	public void storeObject() throws IllegalAccessException, InvalidPersistException {
 		// crear una sesion
+		int sessionKey = 1;
 		// guardar session id
-		persistidor.createSession(8, 999);
+		persistidor.createSession(sessionKey, 100);
 		
 		// guardar un objeto
 		
-		persistidor.store(8, persona);
-		persistidor.store(8, auto);
+		persistidor.store(sessionKey, persona);
+		//persistidor.store(sessionKey, auto);
 		
 		// levantarlo
 		
-		assertEquals(1, 1);
+		Object object = persistidor.load(sessionKey, Persona.class);
+		Persona personaGuardada = (Persona) object;
+		
 		
 		// borrar session
+		persistidor.destroySession(sessionKey);
+		
+		assertEquals(1, 1);
+		System.out.println("nombre real: " + persona.getNombre());
+		System.out.println("nombre guardado: " + personaGuardada.getNombre());
+		assertEquals(persona.getNombre(), personaGuardada.getNombre());
+		assertEquals(persona.getApellido(), personaGuardada.getApellido());
+		assertEquals(persona.getEdad(), personaGuardada.getEdad());
+		assertNull(personaGuardada.getAltura());
 	}
 	
 	/*@Test

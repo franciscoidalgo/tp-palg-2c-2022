@@ -17,7 +17,7 @@ public class Session {
 	
 	@Id
 	@Column(name = "SESSIONKEY")
-	private int key;
+	private long key;
 	
 	@Column(name = "TIMEOUT")
 	private int timeout;
@@ -27,12 +27,12 @@ public class Session {
 
 	public Session() {}
 
-	public Session(int key, int timeout) {
+	public Session(long key, int timeout) {
 		this.key = key;
 		this.timeout = timeout;
 	}
 
-	public int getKey() {
+	public long getKey() {
 		return key;
 	}
 

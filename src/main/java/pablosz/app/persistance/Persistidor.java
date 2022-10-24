@@ -1,8 +1,10 @@
 package pablosz.app.persistance;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.Transient;
 import javax.transaction.Transactional;
 
@@ -36,7 +38,11 @@ public class Persistidor {
 		Field[] fields = clazz.getDeclaredFields();
 		for (Field field : fields){
 			if (field.isAnnotationPresent(Persistable.class) || (clazz.isAnnotationPresent(Persistable.class) && !field.isAnnotationPresent(NotPersistable.class))){
+
+				// string no pasar a json 
+				
 				jsonElement.addProperty(field.getName(), gson.toJson(field.get(object)));
+				
 			}
 		}
 		
@@ -47,6 +53,17 @@ public class Persistidor {
 		
 		em.persist(persistentObject);
 	}
+	
+	public Object load(long key, Class<?> clazz) {
+		Query query = em.createQuery("from PersistentObject where sessionKey=:sessionKey and className=:className")
+				.setParameter("sessionKey", key)
+				.setParameter("className", clazz.getName());
+		
+		String jsonObject = ((PersistentObject) query.getSingleResult()).getData();
+		
+		Gson gson = new Gson();
+		return gson.fromJson(jsonObject, clazz);
+	}
 
 	
 	/*public <T> T toObject(Class<T> c) throws ClassNotFoundException {
@@ -56,9 +73,20 @@ public class Persistidor {
 	
 	
 	@Transactional
-	public void createSession(int key, int timeout) {
+	public void createSession(long key, int timeout) {
 		Session session = new Session(key, timeout);
 		em.persist(session);
+	}
+	
+	@Transactional
+	public void destroySession(long key) {
+		Session sessionToDestroy = em.find(Session.class, key);
+		if(sessionToDestroy != null) {
+			Query query = em.createQuery("delete from PersistentObject where sessionKey=:sessionKey")
+					.setParameter("sessionKey", key);
+			query.executeUpdate();
+			em.remove(sessionToDestroy);
+		}
 	}
 	
 	public void setEm(EntityManager em) {
