@@ -8,8 +8,6 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "PERSISTENT_OBJECT")
-@Getter
-@Setter
 public class PersistentObject {
 
     @Id
@@ -28,4 +26,38 @@ public class PersistentObject {
     public PersistentObject() {
         super();
     }
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public long getSessionKey() {
+		return sessionKey;
+	}
+
+	public void setSessionKey(long sessionKey) {
+		this.sessionKey = sessionKey;
+	}
+
+	public String getClassName() {
+		return className;
+	}
+
+	public void setClassName(String className) {
+		this.className = className;
+	}
+
+	public String getData() {
+		return data;
+	}
+
+	public void setData(String data) {
+		this.data = data;
+	}
+    
+    
 }

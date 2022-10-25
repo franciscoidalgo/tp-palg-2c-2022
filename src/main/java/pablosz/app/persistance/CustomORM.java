@@ -12,6 +12,9 @@ import pablosz.app.persistance.exceptions.InvalidPersistException;
 import pablosz.app.persistance.persisentObject.PersistanceObjectBuilder;
 import pablosz.app.persistance.persisentObject.PersistentObject;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
+import pablosz.test.objects.Persona;
+
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -30,6 +33,15 @@ public class CustomORM {
     @Transactional
     public void store(long key, Object object) throws InvalidPersistException {
         if (object.getClass().isAnnotationPresent(NotPersistable.class)) throw new InvalidPersistException();
+        
+        List<PersistentObject> storedObjects = (List<PersistentObject>) PersistentObjectQuery.selectQuery(em, key, Persona.class.getName()).getResultList();
+        
+        if(storedObjects != null && storedObjects.size() > 0) {
+        	storedObjects.stream().forEach(storedObject -> {
+        		em.remove(storedObject);
+        	});
+        }
+        
         CustomExclusionStrategy customExclusionStrategy = new CustomExclusionStrategy();
         Gson gson = new GsonBuilder().addSerializationExclusionStrategy(customExclusionStrategy).create();
 
@@ -71,7 +83,7 @@ public class CustomORM {
 
     @Transactional
     public void destroySession(long key) throws FailedSessionDeletion {
-        Query query = em.createQuery("delete from PersistentObject where sessionKey=:sessionKey")
+        Query query = em.createQuery("delete from Session where key=:sessionKey")
                 .setParameter("sessionKey", key);
         if (query.executeUpdate() != 1) throw new FailedSessionDeletion();
     }

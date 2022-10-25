@@ -5,8 +5,6 @@ import lombok.Setter;
 import pablosz.app.persistance.ann.NotPersistable;
 import pablosz.app.persistance.ann.Persistable;
 
-@Getter
-@Setter
 public class Persona {
 
     @Persistable
@@ -32,5 +30,45 @@ public class Persona {
         this.altura = altura;
         this.auto = new Auto("Volkswagen", "Golf");
     }
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getApellido() {
+		return apellido;
+	}
+
+	public void setApellido(String apellido) {
+		this.apellido = apellido;
+	}
+
+	public int getEdad() {
+		return edad;
+	}
+
+	public void setEdad(int edad) {
+		this.edad = edad;
+	}
+
+	public int getAltura() {
+		return altura;
+	}
+
+	public void setAltura(int altura) {
+		this.altura = altura;
+	}
+
+	public Auto getAuto() {
+		return auto;
+	}
+
+	public void setAuto(Auto auto) {
+		this.auto = auto;
+	}
 
 }

@@ -5,8 +5,6 @@ import lombok.Setter;
 import pablosz.app.persistance.ann.NotPersistable;
 import pablosz.app.persistance.ann.Persistable;
 
-@Getter
-@Setter
 public class Auto {
     @Persistable
     String marca;
@@ -24,4 +22,29 @@ public class Auto {
         this.numeroDeSerie = marca + "-" + modelo;
     }
 
+	public String getMarca() {
+		return marca;
+	}
+
+	public void setMarca(String marca) {
+		this.marca = marca;
+	}
+
+	public String getModelo() {
+		return modelo;
+	}
+
+	public void setModelo(String modelo) {
+		this.modelo = modelo;
+	}
+
+	public String getNumeroDeSerie() {
+		return numeroDeSerie;
+	}
+
+	public void setNumeroDeSerie(String numeroDeSerie) {
+		this.numeroDeSerie = numeroDeSerie;
+	}
+
+    
 }
