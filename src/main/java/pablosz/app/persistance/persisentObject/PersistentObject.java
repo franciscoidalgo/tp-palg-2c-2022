@@ -1,8 +1,5 @@
 package pablosz.app.persistance.persisentObject;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.persistence.*;
 
 
@@ -11,7 +8,8 @@ import javax.persistence.*;
 public class PersistentObject {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "ID")
     private int id;
 
     @Column(name = "SESSION_KEY")
@@ -27,37 +25,37 @@ public class PersistentObject {
         super();
     }
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public long getSessionKey() {
-		return sessionKey;
-	}
+    public long getSessionKey() {
+        return sessionKey;
+    }
 
-	public void setSessionKey(long sessionKey) {
-		this.sessionKey = sessionKey;
-	}
+    public void setSessionKey(long sessionKey) {
+        this.sessionKey = sessionKey;
+    }
 
-	public String getClassName() {
-		return className;
-	}
+    public String getClassName() {
+        return className;
+    }
 
-	public void setClassName(String className) {
-		this.className = className;
-	}
+    public void setClassName(String className) {
+        this.className = className;
+    }
 
-	public String getData() {
-		return data;
-	}
+    public String getData() {
+        return data;
+    }
 
-	public void setData(String data) {
-		this.data = data;
-	}
-    
-    
+    public void setData(String data) {
+        this.data = data;
+    }
+
+
 }

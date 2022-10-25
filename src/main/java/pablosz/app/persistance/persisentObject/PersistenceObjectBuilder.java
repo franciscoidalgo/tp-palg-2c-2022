@@ -1,25 +1,25 @@
 package pablosz.app.persistance.persisentObject;
 
-public class PersistanceObjectBuilder {
+public class PersistenceObjectBuilder {
 
     PersistentObject po;
 
-    public PersistanceObjectBuilder() {
+    public PersistenceObjectBuilder() {
         super();
         this.po = new PersistentObject();
     }
 
-    public PersistanceObjectBuilder setSessionKey(long key) {
+    public PersistenceObjectBuilder setSessionKey(long key) {
         this.po.setSessionKey(key);
         return this;
     }
 
-    public PersistanceObjectBuilder setClassName(String className) {
+    public PersistenceObjectBuilder setClassName(String className) {
         this.po.setClassName(className);
         return this;
     }
 
-    public PersistanceObjectBuilder setData(String data) {
+    public PersistenceObjectBuilder setData(String data) {
         this.po.setData(data);
         return this;
     }

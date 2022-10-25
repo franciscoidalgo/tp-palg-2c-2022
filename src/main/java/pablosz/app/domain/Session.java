@@ -1,8 +1,5 @@
 package pablosz.app.domain;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,13 +7,11 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "SESSIONS")
-@Getter
-@Setter
 public class Session {
 
 
     @Id
-    @Column(name = "SESSIONKEY")
+    @Column(name = "SESSION_KEY")
     private long key;
 
     @Column(name = "TIMEOUT")
@@ -33,4 +28,19 @@ public class Session {
         this.timeout = timeout;
     }
 
+    public long getKey() {
+        return key;
+    }
+
+    public void setKey(long key) {
+        this.key = key;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
 }
