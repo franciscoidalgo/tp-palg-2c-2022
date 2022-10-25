@@ -5,6 +5,10 @@ import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pablosz.app.domain.Session;
+import pablosz.app.persistance.ann.NotPersistable;
+import pablosz.app.persistance.exceptions.FailedDeletionException;
+import pablosz.app.persistance.exceptions.FailedSessionDeletion;
+import pablosz.app.persistance.exceptions.InvalidPersistException;
 import pablosz.app.persistance.persisentObject.PersistanceObjectBuilder;
 import pablosz.app.persistance.persisentObject.PersistentObject;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
@@ -24,7 +28,8 @@ public class CustomORM {
 
 
     @Transactional
-    public void store(long key, Object object) {
+    public void store(long key, Object object) throws InvalidPersistException {
+        if (object.getClass().isAnnotationPresent(NotPersistable.class)) throw new InvalidPersistException();
         CustomExclusionStrategy customExclusionStrategy = new CustomExclusionStrategy();
         Gson gson = new GsonBuilder().addSerializationExclusionStrategy(customExclusionStrategy).create();
 
@@ -40,17 +45,20 @@ public class CustomORM {
     @Transactional
     public Object load(long key, Class<?> clazz) {
 
-        String jsonObject = ((PersistentObject) PersistentObjectQuery.selectQuery(em, key, clazz.getName()).getSingleResult()).getData();
+        String jsonObject = ((PersistentObject) PersistentObjectQuery.selectQuery(em, key, clazz.getName())
+                .getSingleResult())
+                .getData();
 
         Gson gson = new Gson();
         return gson.fromJson(jsonObject, clazz);
     }
 
     @Transactional
-    public Object remove(long key, Class<?> clazz) {
+    public Object remove(long key, Class<?> clazz) throws FailedDeletionException {
 
         Object result = this.load(key, clazz);
-        PersistentObjectQuery.deleteQuery(this.em, key, clazz.getName()).executeUpdate();
+        if (PersistentObjectQuery.deleteQuery(this.em, key, clazz.getName()).executeUpdate() == 0)
+            throw new FailedDeletionException();
 
         return result;
     }
@@ -62,9 +70,10 @@ public class CustomORM {
     }
 
     @Transactional
-    public void destroySession(long key) {
-        Query query = em.createQuery("delete from PersistentObject where sessionKey=:sessionKey").setParameter("sessionKey", key);
-        query.executeUpdate();
+    public void destroySession(long key) throws FailedSessionDeletion {
+        Query query = em.createQuery("delete from PersistentObject where sessionKey=:sessionKey")
+                .setParameter("sessionKey", key);
+        if (query.executeUpdate() != 1) throw new FailedSessionDeletion();
     }
 
     public void setEm(EntityManager em) {

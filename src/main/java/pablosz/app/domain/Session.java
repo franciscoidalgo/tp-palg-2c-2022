@@ -32,5 +32,5 @@ public class Session {
         this.key = key;
         this.timeout = timeout;
     }
-    
+
 }

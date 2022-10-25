@@ -1,6 +1,6 @@
 package pablosz.test;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +8,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import pablosz.app.Application;
 import pablosz.app.persistance.CustomORM;
-import pablosz.app.persistance.InvalidPersistException;
+import pablosz.app.persistance.exceptions.FailedDeletionException;
+import pablosz.app.persistance.exceptions.FailedSessionDeletion;
+import pablosz.app.persistance.exceptions.InvalidPersistException;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
-import pablosz.test.objects.Auto;
 import pablosz.test.objects.Persona;
 
 import javax.persistence.EntityManager;
@@ -24,8 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @SpringBootTest(classes = Application.class)
 public class PersistentObjectTest {
 
-    private final Persona persona = new Persona("nombrePersona", "apellidoPersona", 22, 180);
-    private final Auto auto = new Auto("Ford", "Fiesta");
     @Autowired
     private EntityManager em;
     private CustomORM persistidor;
@@ -33,26 +32,23 @@ public class PersistentObjectTest {
     private Persona examplePersona;
     private long key;
 
-    @BeforeAll
-    public void setup() {
-        persistidor = new CustomORM();
-        persistidor.setEm(em);
-    }
-
     @BeforeEach
     public void setupExampleObjects() {
+        persistidor = new CustomORM();
+        persistidor.setEm(em);
         examplePersona = new Persona("Some name", "Some last name", 25, 180);
         key = new Random().nextLong();
     }
 
     @Test
-    public void storesAnObject() {
-        List<Persona> storedPersonas = PersistentObjectQuery.selectQuery(em, key, Persona.class.getName()).getResultList();
-        assertFalse(storedPersonas.isEmpty());
+    public void storesAnObject() throws InvalidPersistException {
+        persistidor.store(key, examplePersona);
+        PersistentObjectQuery.selectQuery(em, key, Persona.class.getName())
+                .getSingleResult();
     }
 
     @Test
-    public void loadsAnObject() {
+    public void loadsAnObject() throws InvalidPersistException {
         persistidor.store(key, examplePersona);
 
         Persona loadedPersona = (Persona) persistidor.load(key, Persona.class);
@@ -65,10 +61,25 @@ public class PersistentObjectTest {
 
     }
 
+    @Test
+    public void removesAnObject() throws InvalidPersistException, FailedDeletionException {
+        persistidor.store(key, examplePersona);
+        persistidor.remove(key, Persona.class);
+    }
+
     //TODO add tests for other methods
     @Test
-    public void createsASession() throws IllegalAccessException, InvalidPersistException {
+    public void createsASession() {
+        persistidor.createSession(key, 500000);
+        List<Session> sessions = em.createQuery("from Session").getResultList();
 
+        assertFalse(sessions.isEmpty());
+    }
+
+    @Test
+    public void destroysASession() throws FailedSessionDeletion {
+        persistidor.createSession(key, 5000);
+        persistidor.destroySession(key);
     }
 
 }

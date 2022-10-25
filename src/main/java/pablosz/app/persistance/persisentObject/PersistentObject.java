@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class PersistentObject {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     private int id;
 
     @Column(name = "SESSION_KEY")
