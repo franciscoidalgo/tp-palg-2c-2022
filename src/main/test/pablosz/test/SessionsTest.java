@@ -18,10 +18,7 @@ import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Rollback(false)
 @SpringBootTest(classes = Application.class)
@@ -54,10 +51,10 @@ public class SessionsTest {
     }
 
     // Test para excepcion
-    @Test
-    public void destroysASession() throws FailedSessionDeletion {
-        persistidor.createSession(sessionKey, 5000);
-        persistidor.destroySession(sessionKey);
-    }
-
+  @Test
+  public void destroyInvalidSessionThrowsFailedSessionDeletion() {
+    assertThrows(FailedSessionDeletion.class, () -> {
+      persistidor.destroySession(1);
+    });
+  }
 }

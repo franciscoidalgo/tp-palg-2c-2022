@@ -13,9 +13,12 @@ import pablosz.app.persistance.exceptions.FailedSessionDeletion;
 import pablosz.app.persistance.exceptions.InvalidPersistException;
 import pablosz.app.persistance.persisentObject.PersistentObject;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
+import pablosz.test.objects.Auto;
 import pablosz.test.objects.Persona;
 
 import javax.persistence.NoResultException;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,6 +30,7 @@ public class PersistentObjectTest {
     private CustomORM persistidor;
 
     private Persona examplePersona;
+    private Auto exampleAuto;
 
     private long sessionKey = 9999;
 
@@ -82,7 +86,7 @@ public class PersistentObjectTest {
         assertThrows(NoResultException.class, () -> persistidor.load(sessionKey, Persona.class));
 
     }
-
+    //Update del objeto
     @Test
     public void alwaysStoreLastObject() throws InvalidPersistException, FailedDeletionException {
         persistidor.store(sessionKey, examplePersona);
@@ -103,5 +107,16 @@ public class PersistentObjectTest {
 
     }
 
+    @Test
+    public void storeTwoObjectsOneSession() throws InvalidPersistException {
+        persistidor.store(sessionKey,examplePersona);
+        persistidor.store(sessionKey, exampleAuto);
+
+        List<PersistentObject> objectStored = (List<PersistentObject>) PersistentObjectQuery.selectQuery(persistidor.getEm(), sessionKey)
+            .getResultList();
+
+        assertEquals(2, objectStored.size());
+
+    }
 
 }
