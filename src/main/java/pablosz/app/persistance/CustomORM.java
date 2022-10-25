@@ -32,7 +32,7 @@ public class CustomORM {
     public void store(long key, Object object) throws InvalidPersistException {
         if (object.getClass().isAnnotationPresent(NotPersistable.class)) throw new InvalidPersistException();
 
-        List<PersistentObject> storedObjects = (List<PersistentObject>) PersistentObjectQuery.selectQuery(em, key, Object.class.getName()).getResultList();
+        List<PersistentObject> storedObjects = (List<PersistentObject>) PersistentObjectQuery.selectQuery(em, key, object.getClass().getName()).getResultList();
 
         CustomExclusionStrategy customExclusionStrategy = new CustomExclusionStrategy();
         Gson gson = new GsonBuilder().addSerializationExclusionStrategy(customExclusionStrategy).create();
@@ -82,6 +82,10 @@ public class CustomORM {
         Query query = em.createQuery("delete from Session where key=:sessionKey")
                 .setParameter("sessionKey", key);
         if (query.executeUpdate() != 1) throw new FailedSessionDeletion();
+    }
+
+    public EntityManager getEm() {
+        return this.em;
     }
 
     public void setEm(EntityManager em) {

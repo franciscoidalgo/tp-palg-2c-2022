@@ -15,17 +15,13 @@ import pablosz.app.persistance.persisentObject.PersistentObject;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
 import pablosz.test.objects.Persona;
 
-import javax.persistence.EntityManager;
-import java.util.List;
+import javax.persistence.NoResultException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @Rollback(false)
 @SpringBootTest(classes = Application.class)
 public class PersistentObjectTest {
-
-    @Autowired
-    private EntityManager em;
 
     @Autowired
     private CustomORM persistidor;
@@ -43,13 +39,16 @@ public class PersistentObjectTest {
 
     @AfterEach
     public void clean() throws FailedSessionDeletion {
+
+        // Los objetos persistidos se eliminan cuando se destruye la sesion
         persistidor.destroySession(sessionKey);
+
     }
 
     @Test
     public void storesAnObject() throws InvalidPersistException, FailedDeletionException {
         persistidor.store(sessionKey, examplePersona);
-        PersistentObject objectStored = (PersistentObject) PersistentObjectQuery.selectQuery(em, sessionKey, Persona.class.getName())
+        PersistentObject objectStored = (PersistentObject) PersistentObjectQuery.selectQuery(persistidor.getEm(), sessionKey, Persona.class.getName())
                 .getSingleResult();
 
         assertNotNull(objectStored.getData());
@@ -80,9 +79,8 @@ public class PersistentObjectTest {
 
         persistidor.remove(sessionKey, Persona.class);
 
-        List<PersistentObject> objects = PersistentObjectQuery.selectQuery(em, sessionKey, Persona.class.getName()).getResultList();
+        assertThrows(NoResultException.class, () -> persistidor.load(sessionKey, Persona.class));
 
-        assertEquals(0, objects.size());
     }
 
     @Test
