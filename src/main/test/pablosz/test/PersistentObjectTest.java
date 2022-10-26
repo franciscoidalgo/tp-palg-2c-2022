@@ -37,7 +37,7 @@ public class PersistentObjectTest {
     @BeforeEach
     public void setupExampleObjects() {
         examplePersona = new Persona("Some name", "Some last name", 25, 180);
-
+        exampleAuto = new Auto("Toyota","supra");
         persistidor.createSession(sessionKey, 500000);
     }
 
@@ -106,7 +106,6 @@ public class PersistentObjectTest {
         assertNull(loadedPersona.getAuto().getNumeroDeSerie());
 
     }
-
     @Test
     public void storeTwoObjectsOneSession() throws InvalidPersistException {
         persistidor.store(sessionKey,examplePersona);
@@ -116,7 +115,12 @@ public class PersistentObjectTest {
             .getResultList();
 
         assertEquals(2, objectStored.size());
-
     }
 
+    @Test
+    public void delectObjectException() {
+        assertThrows(NoResultException.class, () -> {
+            persistidor.remove(1001, Persona.class);
+        });
+    }
 }
