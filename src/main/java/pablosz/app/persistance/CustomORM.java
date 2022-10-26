@@ -55,7 +55,6 @@ public class CustomORM implements PersistentObject {
             String jsonObject = ((PersistedObject) PersistentObjectQuery.selectQuery(em, key, clazz.getName())
                     .getSingleResult())
                     .getData();
-            System.out.println(jsonObject);
             Gson gson = new Gson();
             return gson.fromJson(jsonObject, clazz);
         } catch (NoResultException e) {
