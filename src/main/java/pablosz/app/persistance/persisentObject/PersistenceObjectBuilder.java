@@ -2,11 +2,11 @@ package pablosz.app.persistance.persisentObject;
 
 public class PersistenceObjectBuilder {
 
-    PersistentObject po;
+    PersistedObject po;
 
     public PersistenceObjectBuilder() {
         super();
-        this.po = new PersistentObject();
+        this.po = new PersistedObject();
     }
 
     public PersistenceObjectBuilder setSessionKey(long key) {
@@ -24,7 +24,7 @@ public class PersistenceObjectBuilder {
         return this;
     }
 
-    public PersistentObject build() {
+    public PersistedObject build() {
         return this.po;
     }
 }
