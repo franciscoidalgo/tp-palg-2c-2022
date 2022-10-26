@@ -13,6 +13,7 @@ import pablosz.app.persistance.exceptions.FailedSessionDeletion;
 import pablosz.app.persistance.exceptions.InvalidPersistException;
 import pablosz.app.persistance.persisentObject.PersistentObject;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
+import pablosz.test.objects.Animal;
 import pablosz.test.objects.Auto;
 import pablosz.test.objects.Persona;
 
@@ -121,6 +122,14 @@ public class PersistentObjectTest {
     public void delectObjectException() {
         assertThrows(NoResultException.class, () -> {
             persistidor.remove(1001, Persona.class);
+        });
+    }
+    
+    @Test
+    public void storeObjectNotPersistableShouldThrowInvalidPersistException() {
+    	Animal animal = new Animal("perro");
+        assertThrows(InvalidPersistException.class, () -> {
+            persistidor.store(sessionKey, animal);
         });
     }
 }
