@@ -6,20 +6,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pablosz.app.domain.Session;
 import pablosz.app.persistance.ann.NotPersistable;
-import pablosz.app.persistance.exceptions.FailedDeletionException;
-import pablosz.app.persistance.exceptions.FailedSessionDeletion;
-import pablosz.app.persistance.exceptions.InvalidPersistException;
+import pablosz.app.persistance.persisentObject.PersistedObject;
 import pablosz.app.persistance.persisentObject.PersistenceObjectBuilder;
 import pablosz.app.persistance.persisentObject.PersistentObject;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
+import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import java.util.List;
 
 @Component
-public class CustomORM {
+public class CustomORM implements PersistentObject {
 
     @Autowired
     private EntityManager em;
@@ -29,44 +27,46 @@ public class CustomORM {
 
 
     @Transactional()
-    public void store(long key, Object object) throws InvalidPersistException {
-        if (object.getClass().isAnnotationPresent(NotPersistable.class)) throw new InvalidPersistException();
+    public void store(long key, Object object) {
+        if (!object.getClass().isAnnotationPresent(NotPersistable.class)) {
+            List<PersistedObject> storedObjects = (List<PersistedObject>) PersistentObjectQuery.selectQuery(em, key, object.getClass().getName()).getResultList();
 
-        List<PersistentObject> storedObjects = (List<PersistentObject>) PersistentObjectQuery.selectQuery(em, key, object.getClass().getName()).getResultList();
+            CustomExclusionStrategy customExclusionStrategy = new CustomExclusionStrategy();
+            Gson gson = new GsonBuilder().addSerializationExclusionStrategy(customExclusionStrategy).create();
 
-        CustomExclusionStrategy customExclusionStrategy = new CustomExclusionStrategy();
-        Gson gson = new GsonBuilder().addSerializationExclusionStrategy(customExclusionStrategy).create();
+            PersistedObject persistedObject = new PersistenceObjectBuilder()
+                    .setClassName(object.getClass().getName())
+                    .setSessionKey(key)
+                    .setData(gson.toJson(object))
+                    .build();
 
-        PersistentObject persistentObject = new PersistenceObjectBuilder()
-                .setClassName(object.getClass().getName())
-                .setSessionKey(key)
-                .setData(gson.toJson(object))
-                .build();
-
-        if (storedObjects != null && storedObjects.size() > 0) {
-            PersistentObjectQuery.updateQuery(em, key, persistentObject).executeUpdate();
-        } else {
-            em.persist(persistentObject);
+            if (storedObjects != null && storedObjects.size() > 0) {
+                PersistentObjectQuery.updateQuery(em, key, persistedObject).executeUpdate();
+            } else {
+                em.persist(persistedObject);
+            }
         }
     }
 
     @Transactional
     public Object load(long key, Class<?> clazz) {
 
-        String jsonObject = ((PersistentObject) PersistentObjectQuery.selectQuery(em, key, clazz.getName())
-                .getSingleResult())
-                .getData();
-
-        Gson gson = new Gson();
-        return gson.fromJson(jsonObject, clazz);
+        try {
+            String jsonObject = ((PersistedObject) PersistentObjectQuery.selectQuery(em, key, clazz.getName())
+                    .getSingleResult())
+                    .getData();
+            Gson gson = new Gson();
+            return gson.fromJson(jsonObject, clazz);
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     @Transactional
-    public Object remove(long key, Class<?> clazz) throws FailedDeletionException {
+    public Object remove(long key, Class<?> clazz) {
 
         Object result = this.load(key, clazz);
-        if (PersistentObjectQuery.deleteQuery(this.em, key, clazz.getName()).executeUpdate() == 0)
-            throw new FailedDeletionException();
+        PersistentObjectQuery.deleteQuery(this.em, key, clazz.getName()).executeUpdate();
 
         return result;
     }
@@ -78,10 +78,10 @@ public class CustomORM {
     }
 
     @Transactional
-    public void destroySession(long key) throws FailedSessionDeletion {
-        Query query = em.createQuery("delete from Session where key=:sessionKey")
-                .setParameter("sessionKey", key);
-        if (query.executeUpdate() != 1) throw new FailedSessionDeletion();
+    public void destroySession(long key) {
+        em.createQuery("delete from Session where key=:sessionKey")
+                .setParameter("sessionKey", key)
+                .executeUpdate();
     }
 
     public EntityManager getEm() {

@@ -1,61 +1,14 @@
 package pablosz.app.persistance.persisentObject;
 
-import javax.persistence.*;
+public interface PersistentObject {
+    void store(long key, Object object);
 
+    Object load(long key, Class<?> clazz);
 
-@Entity
-@Table(name = "PERSISTENT_OBJECT")
-public class PersistentObject {
+    Object remove(long key, Class<?> clazz);
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "ID")
-    private int id;
+    void createSession(long key, int timeout);
 
-    @Column(name = "SESSION_KEY")
-    private long sessionKey;
-
-    @Column(name = "CLASS_NAME")
-    private String className;
-
-    @Column(name = "DATA")
-    private String data; // Json
-
-    public PersistentObject() {
-        super();
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public long getSessionKey() {
-        return sessionKey;
-    }
-
-    public void setSessionKey(long sessionKey) {
-        this.sessionKey = sessionKey;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
+    void destroySession(long key);
 
 }

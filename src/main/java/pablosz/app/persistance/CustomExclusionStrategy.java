@@ -9,8 +9,10 @@ public class CustomExclusionStrategy implements ExclusionStrategy {
 
     @Override
     public boolean shouldSkipField(FieldAttributes fieldAttributes) {
-        return (fieldAttributes.getAnnotation(Persistable.class) == null && !fieldAttributes.getClass().isAnnotationPresent(Persistable.class))
-                || fieldAttributes.getAnnotation(NotPersistable.class) != null;
+        boolean attributeIsPersistable = fieldAttributes.getAnnotation(Persistable.class) != null;
+        boolean classIsPersistable = fieldAttributes.getDeclaringClass().isAnnotationPresent(Persistable.class);
+        boolean attributeIsNotPersistable = fieldAttributes.getAnnotation(NotPersistable.class) != null;
+        return (!attributeIsPersistable && !classIsPersistable) || attributeIsNotPersistable;
     }
 
     @Override
