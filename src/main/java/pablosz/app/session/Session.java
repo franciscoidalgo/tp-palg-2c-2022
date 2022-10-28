@@ -1,4 +1,4 @@
-package pablosz.app.domain;
+package pablosz.app.session;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

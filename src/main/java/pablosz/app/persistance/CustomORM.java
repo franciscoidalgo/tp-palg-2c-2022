@@ -4,12 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pablosz.app.domain.Session;
+import pablosz.app.interfaces.PersistentObject;
 import pablosz.app.persistance.ann.NotPersistable;
 import pablosz.app.persistance.persisentObject.PersistedObject;
 import pablosz.app.persistance.persisentObject.PersistenceObjectBuilder;
-import pablosz.app.persistance.persisentObject.PersistentObject;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
+import pablosz.app.session.Session;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;

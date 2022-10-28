@@ -10,9 +10,6 @@ import ourTests.objects.Auto;
 import ourTests.objects.Persona;
 import pablosz.app.Application;
 import pablosz.app.persistance.CustomORM;
-import pablosz.app.persistance.exceptions.FailedDeletionException;
-import pablosz.app.persistance.exceptions.FailedSessionDeletion;
-import pablosz.app.persistance.exceptions.InvalidPersistException;
 import pablosz.app.persistance.persisentObject.PersistedObject;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
 
@@ -41,7 +38,7 @@ public class PersistedObjectTest {
     }
 
     @AfterEach
-    public void clean() throws FailedSessionDeletion {
+    public void clean() {
 
         // Los objetos persistidos se eliminan cuando se destruye la sesion
         persistidor.destroySession(sessionKey);
@@ -49,7 +46,7 @@ public class PersistedObjectTest {
     }
 
     @Test
-    public void storesAnObject() throws InvalidPersistException, FailedDeletionException {
+    public void storesAnObject() {
         persistidor.store(sessionKey, examplePersona);
         PersistedObject objectStored = (PersistedObject) PersistentObjectQuery.selectQuery(persistidor.getEm(), sessionKey, Persona.class.getName())
                 .getSingleResult();
@@ -60,7 +57,7 @@ public class PersistedObjectTest {
     }
 
     @Test
-    public void loadsAnObject() throws InvalidPersistException {
+    public void loadsAnObject() {
         persistidor.store(sessionKey, examplePersona);
 
         Persona loadedPersona = (Persona) persistidor.load(sessionKey, Persona.class);
@@ -83,7 +80,7 @@ public class PersistedObjectTest {
     }
 
     @Test
-    public void removesAnObject() throws InvalidPersistException, FailedDeletionException {
+    public void removesAnObject() {
         persistidor.store(sessionKey, examplePersona);
 
         persistidor.remove(sessionKey, Persona.class);
@@ -94,7 +91,7 @@ public class PersistedObjectTest {
 
     //Update del objeto
     @Test
-    public void alwaysStoreLastObject() throws InvalidPersistException, FailedDeletionException {
+    public void alwaysStoreLastObject() {
         persistidor.store(sessionKey, examplePersona);
 
         Persona examplePersona2 = new Persona("Another name", "Some last name", 50, 180);
@@ -114,7 +111,7 @@ public class PersistedObjectTest {
     }
 
     @Test
-    public void storeTwoObjectsOneSession() throws InvalidPersistException {
+    public void storeTwoObjectsOneSession() {
         persistidor.store(sessionKey, examplePersona);
         persistidor.store(sessionKey, exampleAuto);
 

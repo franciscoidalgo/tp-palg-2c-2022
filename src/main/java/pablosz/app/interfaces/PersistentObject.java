@@ -1,4 +1,4 @@
-package pablosz.app.persistance.persisentObject;
+package pablosz.app.interfaces;
 
 public interface PersistentObject {
     void store(long key, Object object);
