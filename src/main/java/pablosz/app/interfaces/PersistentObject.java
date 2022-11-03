@@ -7,8 +7,11 @@ public interface PersistentObject {
 
     Object remove(long key, Class<?> clazz);
 
-    void createSession(long key, int timeout);
+    void createSession(long key, long timeout);
 
     void destroySession(long key);
 
+    void addListener(SessionListener listener);
+
+    void removeListener(SessionListener listener);
 }

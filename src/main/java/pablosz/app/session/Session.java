@@ -1,9 +1,8 @@
 package pablosz.app.session;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "SESSIONS")
@@ -15,7 +14,10 @@ public class Session {
     private long key;
 
     @Column(name = "TIMEOUT")
-    private int timeout;
+    private long timeout;
+
+    @Transient
+    private LocalDateTime openedTimeStamp;
 
     //@OneToMany
     //private List<PersistentObject> persistentObjects;
@@ -23,9 +25,10 @@ public class Session {
     public Session() {
     }
 
-    public Session(long key, int timeout) {
+    public Session(long key, long timeout) {
         this.key = key;
         this.timeout = timeout;
+        this.openedTimeStamp = LocalDateTime.now();
     }
 
     public long getKey() {
@@ -36,11 +39,15 @@ public class Session {
         this.key = key;
     }
 
-    public int getTimeout() {
+    public long getTimeout() {
         return timeout;
     }
 
     public void setTimeout(int timeout) {
         this.timeout = timeout;
+    }
+
+    public boolean isOpen() {
+        return ChronoUnit.MILLIS.between(LocalDateTime.now(), openedTimeStamp) < timeout;
     }
 }

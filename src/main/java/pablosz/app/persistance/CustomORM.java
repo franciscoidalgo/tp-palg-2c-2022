@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pablosz.app.interfaces.PersistentObject;
+import pablosz.app.interfaces.SessionListener;
 import pablosz.app.persistance.ann.NotPersistable;
 import pablosz.app.persistance.persisentObject.PersistedObject;
 import pablosz.app.persistance.persisentObject.PersistenceObjectBuilder;
@@ -72,7 +73,7 @@ public class CustomORM implements PersistentObject {
     }
 
     @Transactional
-    public void createSession(long key, int timeout) {
+    public void createSession(long key, long timeout) {
         Session session = new Session(key, timeout);
         em.persist(session);
     }
@@ -82,6 +83,16 @@ public class CustomORM implements PersistentObject {
         em.createQuery("delete from Session where key=:sessionKey")
                 .setParameter("sessionKey", key)
                 .executeUpdate();
+    }
+
+    @Override
+    public void addListener(SessionListener listener) {
+        
+    }
+
+    @Override
+    public void removeListener(SessionListener listener) {
+
     }
 
     public EntityManager getEm() {
