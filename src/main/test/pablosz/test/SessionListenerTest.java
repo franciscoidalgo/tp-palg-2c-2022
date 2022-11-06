@@ -31,6 +31,7 @@ public class SessionListenerTest implements SessionListener {
 
     @BeforeEach
     public void init() {
+        po.addListener(this);
         po.createSession(key1, timeOut1);
         po.createSession(key2, timeOut2);
     }

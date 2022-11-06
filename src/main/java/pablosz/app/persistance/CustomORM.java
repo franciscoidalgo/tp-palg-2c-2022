@@ -11,21 +11,26 @@ import pablosz.app.persistance.persisentObject.PersistedObject;
 import pablosz.app.persistance.persisentObject.PersistenceObjectBuilder;
 import pablosz.app.persistance.persisentObject.PersistentObjectQuery;
 import pablosz.app.session.Session;
+import pablosz.app.session.SessionChecker;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Component
 public class CustomORM implements PersistentObject {
-
+    List<SessionListener> sessionListeners = new ArrayList<>();
+    @Autowired
+    SessionChecker sessionChecker;
     @Autowired
     private EntityManager em;
 
     public CustomORM() {
     }
-
 
     @Transactional()
     public void store(long key, Object object) {
@@ -76,6 +81,9 @@ public class CustomORM implements PersistentObject {
     public void createSession(long key, long timeout) {
         Session session = new Session(key, timeout);
         em.persist(session);
+        for (SessionListener listener : sessionListeners) {
+            listener.sessionOpened(key);
+        }
     }
 
     @Transactional
@@ -83,11 +91,34 @@ public class CustomORM implements PersistentObject {
         em.createQuery("delete from Session where key=:sessionKey")
                 .setParameter("sessionKey", key)
                 .executeUpdate();
+        for (SessionListener listener : sessionListeners) {
+            listener.sessionClosed(key);
+        }
     }
 
     @Override
     public void addListener(SessionListener listener) {
-        
+        this.sessionListeners.add(listener);
+        TimerTask checkSessions = new TimerTask() {
+            @Override
+            public void run() {
+                List<Session> sessions = em.createQuery("from Session")
+                        .getResultList();
+                for (Session session : sessions) {
+                    if (session.isActive()) {
+                        //listener.sessionStillOpened(session.getKey());
+                    } else if (session.isOpen()) {
+                        listener.sessionClosed(session.getKey());
+                        sessionChecker.closeSessionInBd(session.getKey());
+                    } else {
+                        listener.sessionStillClosed(session.getKey());
+                    }
+                }
+            }
+        };
+
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(checkSessions, 0, 1000);
     }
 
     @Override
